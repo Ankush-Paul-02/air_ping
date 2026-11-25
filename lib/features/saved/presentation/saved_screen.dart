@@ -66,10 +66,10 @@ class SavedScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(SavedProvider provider) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'A I R P I N G',
           style: TextStyle(
             fontSize: 12,
@@ -78,8 +78,8 @@ class SavedScreen extends StatelessWidget {
             color: AppColors.primary,
           ),
         ),
-        const SizedBox(height: 12),
-        const Text(
+        SizedBox(height: 12),
+        Text(
           'Your saved routes.',
           style: TextStyle(
             fontSize: 30,
@@ -88,8 +88,8 @@ class SavedScreen extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 6),
-        const Text(
+        SizedBox(height: 6),
+        Text(
           'Keep your next destinations close.',
           style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
         ),

@@ -139,8 +139,7 @@ class _CreateWatchScreenState extends State<CreateWatchScreen> {
   // --------------------------------------------------
   // CREATE WATCH
   // --------------------------------------------------
-
-  void createWatch() {
+  Future<void> createWatch() async {
     if (origin == null ||
         destination == null ||
         travelRange == null ||
@@ -163,22 +162,26 @@ class _CreateWatchScreenState extends State<CreateWatchScreen> {
 
     setState(() => isSubmitting = true);
 
-    try {
-      context.read<WatchProvider>().createWatch(
-        origin: origin!.city,
-        destination: destination!.city,
-        originCode: origin!.code,
-        destinationCode: destination!.code,
-        startDate: travelRange!.start,
-        endDate: travelRange!.end,
-        targetPrice: budget,
-        tripType: tripType,
-      );
+    final success = await context.read<WatchProvider>().createWatch(
+      origin: origin!.city,
+      destination: destination!.city,
+      originCode: origin!.code,
+      destinationCode: destination!.code,
+      startDate: travelRange!.start,
+      endDate: travelRange!.end,
+      targetPrice: budget,
+      tripType: tripType,
+    );
 
+    if (!mounted) return;
+
+    setState(() => isSubmitting = false);
+
+    if (success) {
       context.pop();
-    } catch (e) {
-      setState(() => isSubmitting = false);
-      showMessage('Unable to create price watch.');
+    } else {
+      final error = context.read<WatchProvider>().error;
+      showMessage(error ?? 'Unable to create price watch.');
     }
   }
 
@@ -753,7 +756,7 @@ class _AirportSearchSheetState extends State<_AirportSearchSheet> {
 
                     return ListView.separated(
                       itemCount: airports.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (_, _) =>
                           const Divider(color: AppColors.border, height: 1),
                       itemBuilder: (context, index) {
                         final airport = airports[index];

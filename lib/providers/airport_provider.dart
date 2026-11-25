@@ -124,6 +124,12 @@ class AirportProvider extends ChangeNotifier {
       city: 'Srinagar',
       state: 'Jammu and Kashmir',
     ),
+    Airport(
+      code: 'IXA',
+      name: 'Maharaja Bir Bikram Airport',
+      city: 'Agartala',
+      state: 'Tripura',
+    )
   ];
 
   String _query = '';

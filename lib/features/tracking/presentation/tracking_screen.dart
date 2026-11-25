@@ -20,89 +20,130 @@ class TrackingScreen extends StatelessWidget {
             final activeCount = provider.activeWatches.length;
             final pausedCount = watches.length - activeCount;
 
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(24, 22, 24, 32),
-              children: [
-                // Header
-                const Text(
-                  'A I R P I N G',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2.5,
-                    color: AppColors.primary,
+            if (provider.isLoading && watches.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (provider.error != null && watches.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(provider.error!, textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      FilledButton(
+                        onPressed: provider.loadWatches,
+                        child: const Text('Retry'),
+                      ),
+                    ],
                   ),
                 ),
+              );
+            }
 
-                const SizedBox(height: 12),
-
-                const Text(
-                  'Your tracking.',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -1.3,
-                    color: AppColors.textPrimary,
+            return RefreshIndicator(
+              onRefresh: provider.loadWatches,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(24, 22, 24, 32),
+                children: [
+                  // Header
+                  const Text(
+                    'A I R P I N G',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 2.5,
+                      color: AppColors.primary,
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
-                const Text(
-                  'All your flight prices, in one place.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
+                  const Text(
+                    'Your tracking.',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1.3,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 28),
+                  const SizedBox(height: 8),
 
-                // Statistics
-                Row(
-                  children: [
-                    Expanded(
-                      child: _StatCard(
-                        title: 'Active watches',
-                        value: activeCount.toString(),
-                        icon: Icons.radar_rounded,
-                        color: AppColors.primary,
+                  const Text(
+                    'All your flight prices, in one place.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // API error message
+                  if (provider.error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        provider.error!,
+                        style: const TextStyle(
+                          color: AppColors.error,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _StatCard(
-                        title: 'Paused watches',
-                        value: pausedCount.toString(),
-                        icon: CupertinoIcons.pause_circle,
-                        color: AppColors.textSecondary,
+
+                  const SizedBox(height: 16),
+
+                  // Statistics
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _StatCard(
+                          title: 'Active watches',
+                          value: activeCount.toString(),
+                          icon: Icons.radar_rounded,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _StatCard(
+                          title: 'Paused watches',
+                          value: pausedCount.toString(),
+                          icon: CupertinoIcons.pause_circle,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  SectionHeader(
+                    title: 'Your price watches',
+                    subtitle: watches.isEmpty
+                        ? 'Your tracked flights will appear here.'
+                        : '${watches.length} flight '
+                              '${watches.length == 1 ? 'watch' : 'watches'}',
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  if (watches.isEmpty)
+                    const _EmptyState()
+                  else
+                    ...watches.map(
+                      (watch) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: _WatchCard(watch: watch),
                       ),
                     ),
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                SectionHeader(
-                  title: 'Your price watches',
-                  subtitle: watches.isEmpty
-                      ? 'Your tracked flights will appear here.'
-                      : '${watches.length} flight '
-                            '${watches.length == 1 ? 'watch' : 'watches'}',
-                ),
-
-                const SizedBox(height: 18),
-
-                if (watches.isEmpty)
-                  const _EmptyState()
-                else
-                  ...watches.map(
-                    (watch) => Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: _WatchCard(watch: watch),
-                    ),
-                  ),
-              ],
+                ],
+              ),
             );
           },
         ),
@@ -259,9 +300,25 @@ class _WatchCard extends StatelessWidget {
                   CupertinoIcons.ellipsis,
                   color: AppColors.textSecondary,
                 ),
-                onSelected: (value) {
+                onSelected: (value) async {
                   if (value == 'pause') {
-                    context.read<WatchProvider>().pauseWatch(watch.id);
+                    final provider = context.read<WatchProvider>();
+
+                    final success = await provider.pauseWatch(watch.id);
+
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          success
+                              ? (watch.isActive
+                              ? 'Watch paused successfully.'
+                              : 'Watch resumed successfully.')
+                              : provider.error ?? 'Unable to update watch.',
+                        ),
+                      ),
+                    );
                   } else if (value == 'delete') {
                     _confirmDelete(context);
                   }
@@ -454,7 +511,20 @@ class _WatchCard extends StatelessWidget {
     );
 
     if (shouldDelete == true && context.mounted) {
-      context.read<WatchProvider>().deleteWatch(watch.id);
+      final provider = context.read<WatchProvider>();
+      final success = await provider.deleteWatch(watch.id);
+
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success
+                ? 'Price watch deleted.'
+                : provider.error ?? 'Unable to delete watch.',
+          ),
+        ),
+      );
     }
   }
 }
