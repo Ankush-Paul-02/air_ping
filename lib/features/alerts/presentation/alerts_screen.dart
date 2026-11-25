@@ -58,10 +58,10 @@ class AlertsScreen extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'A I R P I N G',
           style: TextStyle(
             fontSize: 12,
@@ -70,8 +70,8 @@ class AlertsScreen extends StatelessWidget {
             color: AppColors.primary,
           ),
         ),
-        const SizedBox(height: 12),
-        const Text(
+        SizedBox(height: 12),
+        Text(
           'Price alerts.',
           style: TextStyle(
             fontSize: 30,
@@ -80,8 +80,8 @@ class AlertsScreen extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 6),
-        const Text(
+        SizedBox(height: 6),
+        Text(
           'Stay ahead of every fare drop.',
           style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
         ),

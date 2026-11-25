@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/section_header.dart';
+import '../../auth/providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,6 +17,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _pushNotifications = true;
   bool _emailNotifications = true;
   bool _priceDropAlerts = true;
+
+  Future<void> _confirmSignOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Sign out?'),
+        content: const Text(
+          'Are you sure you want to sign out of AirPing?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      await context.read<AuthProvider>().signOut();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +114,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileCard() {
+    final user = context.watch<AuthProvider>().user;
+
+    final displayName = user?.displayName ?? 'Flyora User';
+    final email = user?.email ?? 'No email available';
+    final photoUrl = user?.photoURL;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -95,36 +129,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Row(
         children: [
-          Container(
-            height: 58,
-            width: 58,
-            decoration: const BoxDecoration(
-              color: AppColors.primaryLight,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              CupertinoIcons.person_fill,
-              color: AppColors.primary,
-              size: 26,
-            ),
+          CircleAvatar(
+            radius: 29,
+            backgroundColor: AppColors.primaryLight,
+            backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+            child: photoUrl == null
+                ? const Icon(Icons.person, color: AppColors.primary, size: 26)
+                : null,
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Guest User',
-                  style: TextStyle(
+                  displayName,
+                  style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
-                  'Sign in to manage your account',
-                  style: TextStyle(
+                  email,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -231,6 +260,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'About AirPing',
           subtitle: 'Version 1.0.0',
           onTap: () => _showComingSoon('About AirPing'),
+        ),
+        const _SettingsDivider(),
+        _SettingsTile(
+          icon: CupertinoIcons.square_arrow_right,
+          title: 'Sign out',
+          onTap: _confirmSignOut,
         ),
       ],
     );

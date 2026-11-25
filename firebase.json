@@ -1,0 +1,30 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "airplay-97c9d",
+          "appId": "1:700984221187:android:26dcdda4e35912f9433836",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "airplay-97c9d",
+          "appId": "1:700984221187:ios:8a8c593a25b99490433836",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "airplay-97c9d",
+          "configurations": {
+            "android": "1:700984221187:android:26dcdda4e35912f9433836",
+            "ios": "1:700984221187:ios:8a8c593a25b99490433836"
+          }
+        }
+      }
+    }
+  }
+}

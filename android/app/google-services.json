@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "700984221187",
+    "project_id": "airplay-97c9d",
+    "storage_bucket": "airplay-97c9d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700984221187:android:26dcdda4e35912f9433836",
+        "android_client_info": {
+          "package_name": "com.paul.air_ping"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtiry0iESnZbuTSWBzdrxCN6P8qbuK8eA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

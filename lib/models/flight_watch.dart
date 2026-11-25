@@ -25,6 +25,42 @@ class FlightWatch {
     this.isActive = true,
   });
 
+  factory FlightWatch.fromJson(Map<String, dynamic> json) {
+    return FlightWatch(
+      id: json['id'].toString(),
+      origin: json['origin'] as String,
+      destination: json['destination'] as String,
+      originCode: json['originCode'] as String,
+      destinationCode: json['destinationCode'] as String,
+      startDate: DateTime.parse(json['startDate'] as String),
+      endDate: DateTime.parse(json['endDate'] as String),
+      targetPrice: (json['targetPrice'] as num).toDouble(),
+      currentPrice: (json['currentPrice'] as num?)?.toDouble() ?? 0.0,
+      tripType: json['tripType'] as String,
+      isActive: (json['isActive'] ?? json['active'] ?? true) as bool,
+    );
+  }
+
+  Map<String, dynamic> toCreateJson() {
+    return {
+      'origin': origin,
+      'destination': destination,
+      'originCode': originCode,
+      'destinationCode': destinationCode,
+      'startDate': _formatDate(startDate),
+      'endDate': _formatDate(endDate),
+      'targetPrice': targetPrice,
+      'tripType': tripType,
+    };
+  }
+
+  static String _formatDate(DateTime date) {
+    final year = date.year.toString().padLeft(4, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
+  }
+
   FlightWatch copyWith({
     String? id,
     String? origin,

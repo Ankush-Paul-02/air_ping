@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 
-import '../features/navigation/presentation/main_screen.dart';
+import '../features/auth/presentation/auth_gate.dart';
 import '../features/watch/presentation/create_watch_screen.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -9,7 +9,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/',
       name: 'home',
-      builder: (context, state) => const MainScreen(),
+      builder: (context, state) => const AuthGate(),
     ),
     GoRoute(
       path: '/create-watch',
